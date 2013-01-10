@@ -135,6 +135,7 @@ module Qrack
     class Queue        < Class(  50, :queue        ); end
     class Basic        < Class(  60, :basic        ); end
     class Tx           < Class(  90, :tx           ); end
+    class Confirm      < Class(  85, :confirm      ); end
 
     class Connection
 
@@ -391,6 +392,7 @@ module Qrack
       class RecoverAsync < Method( 100, :recover_async  ); end
       class Recover      < Method( 110, :recover        ); end
       class RecoverOk    < Method( 111, :recover_ok     ); end
+      class Nack         < Method( 120, :nack           ); end
 
 
       class Qos
@@ -488,6 +490,12 @@ module Qrack
       class RecoverOk
       end
 
+      class Nack
+        longlong         :delivery_tag
+        bit              :multiple
+        bit              :requeue
+      end
+
     end
 
     class Tx
@@ -520,6 +528,19 @@ module Qrack
 
     end
 
+    class Confirm
+
+      class Select       < Method(  10, :select         ); end
+      class SelectOk     < Method(  11, :select_ok      ); end
+
+      class Select
+        bit              :nowait
+      end
+
+      class SelectOk
+      end
+
+    end
   end
 
 end
