@@ -35,23 +35,23 @@ module Bunny
     end
 
     # Checks response from AMQP methods and takes appropriate action
-    def check_response(received_method, expected_method, err_msg, err_class = Bunny::ProtocolError)
+    def check_response(received_method, expected_methods, err_msg, err_class = Bunny::ProtocolError)
       @last_method = received_method
+      expected_methods = [expected_methods] unless expected_methods.is_a?(Array)
 
-      case
-      when received_method.is_a?(Qrack::Protocol::Connection::Close)
+      if received_method.is_a?(Qrack::Protocol::Connection::Close)
         # Clean up the socket
         close_socket
 
         raise Bunny::ForcedConnectionCloseError, "Error Reply Code: #{received_method.reply_code}\nError Reply Text: #{received_method.reply_text}"
 
-      when received_method.is_a?(Qrack::Protocol::Channel::Close)
+      elsif received_method.is_a?(Qrack::Protocol::Channel::Close)
         # Clean up the channel
         channel.active = false
 
         raise Bunny::ForcedChannelCloseError, "Error Reply Code: #{received_method.reply_code}\nError Reply Text: #{received_method.reply_text}"
 
-      when !received_method.is_a?(expected_method)
+      elsif expected_methods.none? {|expected_method| received_method.is_a?(expected_method)}
         raise err_class, err_msg
 
       else
