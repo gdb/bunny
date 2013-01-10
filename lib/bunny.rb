@@ -9,7 +9,16 @@ require File.expand_path("../bunny/version", __FILE__)
 # if we don't require the version file the same way as in the gemspec,
 # the version file will be loaded twice. and we hate warnings.
 
+# AMQP 0-9-1 specification
+require 'qrack/qrack'
+require 'bunny/client'
+require 'bunny/exchange'
+require 'bunny/queue'
+require 'bunny/channel'
+require 'bunny/subscription'
+
 module Bunny
+  include Qrack
 
   class ConnectionError < StandardError; end
   class ForcedChannelCloseError < StandardError; end
@@ -75,16 +84,6 @@ module Bunny
   private
 
   def self.setup(*args)
-    # AMQP 0-9-1 specification
-    require 'qrack/qrack'
-    require 'bunny/client'
-    require 'bunny/exchange'
-    require 'bunny/queue'
-    require 'bunny/channel'
-    require 'bunny/subscription'
-
-    include Qrack
-
     client = Bunny::Client.new(*args)
   end
 
